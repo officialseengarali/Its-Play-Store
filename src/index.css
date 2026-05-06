@@ -1,0 +1,121 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --font-sans: var(--app-font-sans);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: 0 0% 7%;
+  --foreground: 216 7% 91%;
+  --border: 210 4% 22%;
+  --input: 210 4% 22%;
+  --ring: 162 99% 27%;
+  --card: 240 3% 10%;
+  --card-foreground: 216 7% 91%;
+  --popover: 240 3% 10%;
+  --popover-foreground: 216 7% 91%;
+  --primary: 162 99% 27%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 228 3% 17%;
+  --secondary-foreground: 216 7% 91%;
+  --muted: 228 3% 17%;
+  --muted-foreground: 215 4% 55%;
+  --accent: 162 60% 22%;
+  --accent-foreground: 162 99% 80%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --app-font-sans: 'Google Sans', 'Roboto', system-ui, sans-serif;
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border box-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    min-height: 100vh;
+  }
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Smooth scrolling for carousels */
+.scroll-smooth-x {
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scroll-smooth-x::-webkit-scrollbar {
+  display: none;
+}
+
+/* Play Store green glow effect */
+.green-glow {
+  box-shadow: 0 0 20px hsl(162 99% 27% / 0.3);
+}
+
+/* App card hover */
+.app-card-hover {
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.app-card-hover:hover {
+  transform: translateY(-2px);
+  background-color: hsl(240 3% 13%);
+}
+
+/* Carousel transition */
+.carousel-slide {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Star rating */
+.star-filled {
+  color: #f9ab00;
+}
+.star-empty {
+  color: hsl(var(--border));
+}
