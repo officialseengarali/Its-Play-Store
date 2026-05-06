@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft, Star, Download, Package, Clock, Shield,
-  ChevronRight, Send
+  ChevronRight, Send, Share2, Check
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { App, Screenshot, Review } from "@/lib/types";
@@ -11,6 +11,7 @@ import Navbar from "@/components/Navbar";
 import AppCard from "@/components/AppCard";
 import EmptyState from "@/components/EmptyState";
 import Footer from "@/components/Footer";
+import Lightbox from "@/components/Lightbox";
 
 function RatingBar({ stars, count, total }: { stars: number; count: number; total: number }) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
@@ -41,6 +42,8 @@ export default function AppDetail() {
   const [reviewRating, setReviewRating] = useState(5);
   const [submitting, setSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState("");
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -216,6 +219,18 @@ export default function AppDetail() {
             </div>
 
             <div className="flex flex-wrap gap-3">
+              <button
+                onClick={async () => {
+                  const url = window.location.href;
+                  await navigator.clipboard.writeText(url).catch(() => {});
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-secondary text-foreground text-sm hover:bg-secondary/80 transition-colors"
+              >
+                {copied ? <Check className="w-4 h-4 text-primary" /> : <Share2 className="w-4 h-4" />}
+                {copied ? "Copied!" : "Share"}
+              </button>
               {app.apk_url ? (
                 <a
                   href={app.apk_url}
@@ -246,23 +261,35 @@ export default function AppDetail() {
           <section>
             <h2 className="text-base font-semibold text-foreground mb-3">Screenshots</h2>
             <div className="flex gap-3 overflow-x-auto scroll-smooth-x pb-2">
-              {screenshots.map((ss) => (
-                <div
+              {screenshots.map((ss, i) => (
+                <button
                   key={ss.id}
-                  className="shrink-0 w-44 h-80 rounded-xl overflow-hidden border border-border/50 bg-secondary"
+                  onClick={() => setLightboxIndex(i)}
+                  className="shrink-0 w-44 h-80 rounded-xl overflow-hidden border border-border/50 bg-secondary hover:opacity-90 transition-opacity cursor-zoom-in"
                 >
                   {ss.image_url && (
                     <img
                       src={ss.image_url}
-                      alt="Screenshot"
+                      alt={`Screenshot ${i + 1}`}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
                   )}
-                </div>
+                </button>
               ))}
             </div>
           </section>
+        )}
+
+        {/* Lightbox */}
+        {lightboxIndex !== null && screenshots.length > 0 && (
+          <Lightbox
+            images={screenshots.map(s => s.image_url)}
+            index={lightboxIndex}
+            onClose={() => setLightboxIndex(null)}
+            onPrev={() => setLightboxIndex(i => i !== null ? (i - 1 + screenshots.length) % screenshots.length : 0)}
+            onNext={() => setLightboxIndex(i => i !== null ? (i + 1) % screenshots.length : 0)}
+          />
         )}
 
         {/* Description */}
