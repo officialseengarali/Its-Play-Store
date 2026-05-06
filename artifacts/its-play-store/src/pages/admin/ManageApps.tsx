@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Plus, Edit, Trash2, Star, Download, Search, ArrowLeft } from "lucide-react";
+import { Plus, Edit, Trash2, Star, Download, Search, ArrowLeft, History } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { App } from "@/lib/types";
 
@@ -109,6 +109,12 @@ export default function ManageApps() {
                     {app.is_featured && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">Featured</span>
                     )}
+                    {app.status === "draft" && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">Draft</span>
+                    )}
+                    {app.status === "suspended" && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-destructive/20 text-destructive border border-destructive/30">Suspended</span>
+                    )}
                     {app.categories && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-secondary text-muted-foreground">{app.categories.name}</span>
                     )}
@@ -128,8 +134,16 @@ export default function ManageApps() {
                 {/* Actions */}
                 <div className="flex items-center gap-2 shrink-0">
                   <Link
+                    to={`/admin/apps/${app.id}/versions`}
+                    className="p-2 rounded-lg bg-secondary hover:bg-accent/20 transition-colors"
+                    title="Version History"
+                  >
+                    <History className="w-4 h-4 text-muted-foreground" />
+                  </Link>
+                  <Link
                     to={`/admin/apps/edit/${app.id}`}
                     className="p-2 rounded-lg bg-secondary hover:bg-accent/20 transition-colors"
+                    title="Edit"
                   >
                     <Edit className="w-4 h-4 text-foreground" />
                   </Link>
@@ -137,6 +151,7 @@ export default function ManageApps() {
                     onClick={() => handleDelete(app.id, app.name)}
                     disabled={deleting === app.id}
                     className="p-2 rounded-lg bg-destructive/10 hover:bg-destructive/20 transition-colors disabled:opacity-50"
+                    title="Delete"
                   >
                     <Trash2 className="w-4 h-4 text-destructive" />
                   </button>

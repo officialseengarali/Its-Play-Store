@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, History } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Category, Screenshot } from "@/lib/types";
 
@@ -16,12 +16,13 @@ interface AppFormData {
   rating: string;
   downloads: string;
   is_featured: boolean;
+  status: "live" | "draft" | "suspended";
 }
 
 const EMPTY: AppFormData = {
   name: "", developer: "", category_id: "", description: "",
   icon_url: "", apk_url: "", version: "", size: "",
-  rating: "0", downloads: "0", is_featured: false,
+  rating: "0", downloads: "0", is_featured: false, status: "live",
 };
 
 export default function AppForm() {
@@ -58,6 +59,7 @@ export default function AppForm() {
             version: a.version || "", size: a.size || "",
             rating: String(a.rating ?? 0), downloads: String(a.downloads ?? 0),
             is_featured: a.is_featured || false,
+            status: (a.status as "live" | "draft" | "suspended") || "live",
           });
         }
         setExistingScreenshots((ssRes.data as Screenshot[]) || []);
@@ -87,6 +89,7 @@ export default function AppForm() {
       rating: parseFloat(form.rating) || 0,
       downloads: parseInt(form.downloads) || 0,
       is_featured: form.is_featured,
+      status: form.status,
     };
 
     let appId = id;
@@ -141,6 +144,14 @@ export default function AppForm() {
             <span className="text-border">/</span>
             <span className="text-sm font-medium">{isEdit ? "Edit App" : "New App"}</span>
           </div>
+          {isEdit && (
+            <Link
+              to={`/admin/apps/${id}/versions`}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <History className="w-4 h-4" /> Version History
+            </Link>
+          )}
         </div>
       </header>
 
@@ -187,6 +198,14 @@ export default function AppForm() {
                 className="w-4 h-4 accent-primary"
               />
               <label htmlFor="featured" className="text-sm text-foreground">Feature this app in the hero carousel</label>
+            </div>
+            <div>
+              <label className={labelClass}>App Status</label>
+              <select value={form.status} onChange={e => set("status", e.target.value)} className={fieldClass}>
+                <option value="live">🟢 Live — visible to everyone</option>
+                <option value="draft">🟡 Draft — hidden from store</option>
+                <option value="suspended">🔴 Suspended — removed from store</option>
+              </select>
             </div>
           </div>
 

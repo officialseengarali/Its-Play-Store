@@ -12,6 +12,7 @@ import AdminDashboard from "@/pages/admin/Dashboard";
 import ManageApps from "@/pages/admin/ManageApps";
 import AppForm from "@/pages/admin/AppForm";
 import ManageCategories from "@/pages/admin/ManageCategories";
+import ManageVersions from "@/pages/admin/ManageVersions";
 
 function App() {
   const base = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
@@ -34,6 +35,7 @@ function App() {
         <Route path="/admin/apps/edit/:id" element={<AppForm />} />
         <Route path="/admin/categories" element={<ManageCategories />} />
         <Route path="/admin/categories/new" element={<ManageCategories />} />
+        <Route path="/admin/apps/:appId/versions" element={<ManageVersions />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import { SkeletonCard } from "@/components/SkeletonCard";
 
 type SortOption = "downloads" | "rating" | "created_at" | "name";
+type MinRating = "0" | "3" | "3.5" | "4" | "4.5";
 
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,6 +19,7 @@ export default function Search() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("cat") || "");
   const [sort, setSort] = useState<SortOption>("downloads");
+  const [minRating, setMinRating] = useState<MinRating>("0");
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -27,7 +29,7 @@ export default function Search() {
     });
   }, []);
 
-  const doSearch = useCallback(async (q: string, cat: string, sortBy: SortOption) => {
+  const doSearch = useCallback(async (q: string, cat: string, sortBy: SortOption, minRat: MinRating) => {
     setLoading(true);
     let req = supabase
       .from("apps")
@@ -37,6 +39,7 @@ export default function Search() {
 
     if (q.trim()) req = req.or(`name.ilike.%${q.trim()}%,developer.ilike.%${q.trim()}%`);
     if (cat) req = req.eq("category_id", cat);
+    if (minRat !== "0") req = req.gte("rating", parseFloat(minRat));
 
     const { data } = await req;
     setApps((data as App[]) || []);
@@ -48,7 +51,7 @@ export default function Search() {
     const cat = searchParams.get("cat") || "";
     setQuery(q);
     setSelectedCategory(cat);
-    doSearch(q, cat, sort);
+    doSearch(q, cat, sort, minRating);
   }, [searchParams]);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +61,7 @@ export default function Search() {
     if (val.trim()) params.q = val.trim();
     if (selectedCategory) params.cat = selectedCategory;
     setSearchParams(params);
-    doSearch(val, selectedCategory, sort);
+    doSearch(val, selectedCategory, sort, minRating);
   };
 
   const handleCategory = (catId: string) => {
@@ -67,12 +70,17 @@ export default function Search() {
     if (query.trim()) params.q = query.trim();
     if (catId) params.cat = catId;
     setSearchParams(params);
-    doSearch(query, catId, sort);
+    doSearch(query, catId, sort, minRating);
   };
 
   const handleSort = (s: SortOption) => {
     setSort(s);
-    doSearch(query, selectedCategory, s);
+    doSearch(query, selectedCategory, s, minRating);
+  };
+
+  const handleMinRating = (r: MinRating) => {
+    setMinRating(r);
+    doSearch(query, selectedCategory, sort, r);
   };
 
   const sortLabels: Record<SortOption, string> = {
@@ -132,6 +140,22 @@ export default function Search() {
                 </div>
               </div>
             )}
+            {/* Min Rating filter */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Minimum Rating</p>
+              <div className="flex flex-wrap gap-2">
+                {([["0", "Any"], ["3", "3+★"], ["3.5", "3.5+★"], ["4", "4+★"], ["4.5", "4.5+★"]] as [MinRating, string][]).map(([val, label]) => (
+                  <button
+                    key={val}
+                    onClick={() => handleMinRating(val)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${minRating === val ? "bg-primary text-primary-foreground" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Sort */}
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Sort By</p>

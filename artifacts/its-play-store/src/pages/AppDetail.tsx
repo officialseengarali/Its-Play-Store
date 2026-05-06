@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   ArrowLeft, Star, Download, Package, Clock, Shield,
-  ChevronRight, Send, Share2, Check
+  ChevronRight, Send, Share2, Check, Sparkles, ChevronDown
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import type { App, Screenshot, Review } from "@/lib/types";
+import type { App, Screenshot, Review, AppVersion } from "@/lib/types";
 import type { User } from "@supabase/supabase-js";
 import Navbar from "@/components/Navbar";
 import AppCard from "@/components/AppCard";
@@ -45,6 +45,8 @@ export default function AppDetail() {
   const [reviewError, setReviewError] = useState("");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
+  const [versions, setVersions] = useState<AppVersion[]>([]);
+  const [showAllVersions, setShowAllVersions] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -63,7 +65,7 @@ export default function AppDetail() {
       if (!appData) { setLoading(false); return; }
       setApp(appData as App);
 
-      const [ssRes, revRes, simRes] = await Promise.all([
+      const [ssRes, revRes, simRes, versRes] = await Promise.all([
         supabase
           .from("screenshots")
           .select("*")
@@ -83,11 +85,18 @@ export default function AppDetail() {
               .neq("id", id)
               .limit(6)
           : Promise.resolve({ data: [] }),
+        supabase
+          .from("app_versions")
+          .select("*")
+          .eq("app_id", id)
+          .order("created_at", { ascending: false })
+          .limit(20),
       ]);
 
       setScreenshots((ssRes.data as Screenshot[]) || []);
       setReviews((revRes.data as Review[]) || []);
       setSimilarApps((simRes.data as App[]) || []);
+      setVersions((versRes.data as AppVersion[]) || []);
       setLoading(false);
     }
     fetchData();
@@ -425,6 +434,55 @@ export default function AppDetail() {
             )}
           </div>
         </section>
+
+        {/* What's New / Version History */}
+        {versions.length > 0 && (
+          <section>
+            <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" /> What's New
+            </h2>
+            <div className="bg-card border border-border/50 rounded-2xl p-5 space-y-4">
+              {(showAllVersions ? versions : versions.slice(0, 3)).map((v, i) => (
+                <div key={v.id} className={i > 0 ? "border-t border-border/50 pt-4" : ""}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-semibold text-foreground">Version {v.version}</span>
+                    {i === 0 && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">Latest</span>
+                    )}
+                    {v.size && <span className="text-xs text-muted-foreground">· {v.size}</span>}
+                    <span className="text-xs text-muted-foreground ml-auto">
+                      {new Date(v.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                  </div>
+                  {v.changelog ? (
+                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{v.changelog}</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">No changelog provided.</p>
+                  )}
+                  {v.apk_url && (
+                    <a
+                      href={v.apk_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 mt-2 text-xs text-primary hover:underline"
+                    >
+                      <Download className="w-3 h-3" /> Download v{v.version}
+                    </a>
+                  )}
+                </div>
+              ))}
+              {versions.length > 3 && (
+                <button
+                  onClick={() => setShowAllVersions(p => !p)}
+                  className="flex items-center gap-1.5 text-sm text-primary hover:text-primary/80 transition-colors pt-2 border-t border-border/50"
+                >
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showAllVersions ? "rotate-180" : ""}`} />
+                  {showAllVersions ? "Show less" : `See all ${versions.length} versions`}
+                </button>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Similar Apps */}
         {similarApps.length > 0 && (
