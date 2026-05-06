@@ -6,6 +6,7 @@ import Category from "@/pages/Category";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import NotFound from "@/pages/NotFound";
+import Profile from "@/pages/Profile";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import ManageApps from "@/pages/admin/ManageApps";
 import AppForm from "@/pages/admin/AppForm";
@@ -22,6 +23,7 @@ function App() {
         <Route path="/category/:name" element={<Category />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile />} />
 
         {/* Admin routes */}
         <Route path="/admin" element={<AdminDashboard />} />
