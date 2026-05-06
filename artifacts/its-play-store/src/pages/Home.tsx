@@ -8,8 +8,10 @@ import AppCard from "@/components/AppCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import EmptyState from "@/components/EmptyState";
 import Footer from "@/components/Footer";
+import { useMeta } from "@/hooks/useMeta";
 
 export default function Home() {
+  useMeta({ title: "Home", description: "Discover and download the best Android apps and games on Its Play Store." });
   const [featuredApps, setFeaturedApps] = useState<App[]>([]);
   const [topApps, setTopApps] = useState<App[]>([]);
   const [topRated, setTopRated] = useState<App[]>([]);

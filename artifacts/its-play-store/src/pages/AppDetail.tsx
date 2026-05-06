@@ -12,6 +12,7 @@ import AppCard from "@/components/AppCard";
 import EmptyState from "@/components/EmptyState";
 import Footer from "@/components/Footer";
 import Lightbox from "@/components/Lightbox";
+import { useMeta } from "@/hooks/useMeta";
 
 function RatingBar({ stars, count, total }: { stars: number; count: number; total: number }) {
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
@@ -118,6 +119,12 @@ export default function AppDetail() {
     }
     setSubmitting(false);
   };
+
+  useMeta({
+    title: app?.name,
+    description: app?.description?.slice(0, 160) || `Download ${app?.name} by ${app?.developer}`,
+    image: app?.icon_url || undefined,
+  });
 
   const ratingCounts = [5, 4, 3, 2, 1].map((s) => ({
     stars: s,

@@ -7,6 +7,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import NotFound from "@/pages/NotFound";
 import Profile from "@/pages/Profile";
+import Wishlist from "@/pages/Wishlist";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import ManageApps from "@/pages/admin/ManageApps";
 import AppForm from "@/pages/admin/AppForm";
@@ -24,6 +25,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/wishlist" element={<Wishlist />} />
 
         {/* Admin routes */}
         <Route path="/admin" element={<AdminDashboard />} />

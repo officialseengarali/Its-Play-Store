@@ -40,6 +40,7 @@ export default function Footer() {
               <li><Link to="/login" className="text-xs text-muted-foreground hover:text-foreground transition-colors">Sign In</Link></li>
               <li><Link to="/register" className="text-xs text-muted-foreground hover:text-foreground transition-colors">Create Account</Link></li>
               <li><Link to="/search" className="text-xs text-muted-foreground hover:text-foreground transition-colors">Search Apps</Link></li>
+              <li><Link to="/wishlist" className="text-xs text-muted-foreground hover:text-foreground transition-colors">My Wishlist</Link></li>
             </ul>
           </div>
 

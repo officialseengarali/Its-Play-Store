@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, User, LogOut, Settings, Shield, ChevronDown } from "lucide-react";
+import { Search, User, LogOut, Shield, ChevronDown, Heart } from "lucide-react";
+import { useWishlist } from "@/hooks/useWishlist";
 import { supabase } from "@/lib/supabase";
 import type { User as SupaUser } from "@supabase/supabase-js";
 
@@ -12,6 +13,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { wishlist } = useWishlist();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
@@ -72,6 +74,20 @@ export default function Navbar() {
             />
           </div>
         </form>
+
+        {/* Wishlist */}
+        <Link
+          to="/wishlist"
+          className="relative p-2 rounded-full hover:bg-secondary transition-colors shrink-0"
+          title="My Wishlist"
+        >
+          <Heart className="w-5 h-5 text-muted-foreground hover:text-red-400 transition-colors" />
+          {wishlist.length > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center">
+              {wishlist.length > 9 ? "9+" : wishlist.length}
+            </span>
+          )}
+        </Link>
 
         {/* User Actions */}
         <div className="flex items-center gap-2 shrink-0 relative" ref={menuRef}>
